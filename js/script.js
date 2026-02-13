@@ -1,10 +1,12 @@
 const form = document.querySelector("#formMensagem");
 const input = document.querySelector("#mensagem");
 const erro = document.querySelector("#erro");
-const lista = document.querySelector("#lista");
+const listaMensagens = document.querySelector("#lista");
 
 //"Banco de dados" em memória (array)
 let mensagens = [];
+
+let editandoIndex = null;
 
 function validarTexto(texto) {
   const txt = texto.trim();
@@ -22,13 +24,38 @@ function validarTexto(texto) {
 
 //Renderizando/mostrando a lista na tela
 function render() {
-  lista.innerHTML = "";
+  listaMensagens.innerHTML = "";
 
   //<li> para cada mensagem
-  for (const msg of mensagens) {
+  for (let i = 0; i < mensagens.length; i++) {
     const li = document.createElement("li");
-    li.textContent = msg;
-    lista.append(li);
+
+    const span = document.createElement("span");
+    span.textContent = mensagens[i];
+
+    span.addEventListener("click", () => {
+      input.value = mensagens[indexAtual];
+      input.focus();
+      editandoIndex = indexAtual;
+
+      erro.textContent =
+        "Editando item " + (indexAtual + 1) + " (envie para salvar)";
+    });
+
+    const btnExcluir = document.createElement("button");
+    btnExcluir.type = "button";
+    btnExcluir.textContent = "Excluir";
+
+    const indexAtual = i;
+
+    btnExcluir.addEventListener("click", () => {
+      mensagens.splice(indexAtual, 1);
+      console.log(indexAtual);
+      render();
+    });
+
+    li.append(span, " ", btnExcluir);
+    listaMensagens.append(li);
   }
 }
 
@@ -43,7 +70,17 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
-  mensagens.push(textoDigitado.trim());
+  erro.textContent = "";
+
+  const textoFinal = textoDigitado.trim();
+
+  if (editandoIndex !== null) {
+    mensagens[editandoIndex] = textoFinal;
+    editandoIndex = null;
+  } else {
+    mensagens.push(textoDigitado.trim());
+  }
+
   render();
 
   input.value = "";
@@ -61,5 +98,5 @@ function falar() {
 const botao = document.getElementById("btnFala");
 botao.addEventListener("click", falar);
 
-const botao2 = document.getElementById("btnFala2");
-botao2.addEventListener("click", falar);
+//const botao2 = document.getElementById("btnFala2");
+//botao2.addEventListener("click", falar);
